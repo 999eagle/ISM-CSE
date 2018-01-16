@@ -16,7 +16,7 @@ namespace ISM_CSE
 			if (config == null) return;
 			if (args.Length == 0)
 			{
-				Console.WriteLine($"Usage: {Environment.GetCommandLineArgs()[0]} <search term>");
+				Console.WriteLine($"Usage: {Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[0])} <search term>");
 				return;
 			}
 			Task.Run(async () =>
