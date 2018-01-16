@@ -1,6 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Google.Apis.Customsearch.v1;
+using Google.Apis.Services;
 
 namespace ISM_CSE
 {
@@ -10,6 +14,32 @@ namespace ISM_CSE
 		{
 			var config = ReadConfig();
 			if (config == null) return;
+			if (args.Length == 0)
+			{
+				Console.WriteLine($"Usage: {Environment.GetCommandLineArgs()[0]} <search term>");
+				return;
+			}
+			Task.Run(async () =>
+			{
+				var searchService = new CustomsearchService(new BaseClientService.Initializer()
+				{
+					ApplicationName = "ISM-CSE",
+					ApiKey = config.APIKey
+				});
+				var request = searchService.Cse.List(String.Join(" ", args));
+				request.Cx = config.SearchEngineID;
+				request.Num = 10;
+				var response = await request.ExecuteAsync();
+				Console.WriteLine(
+					String.Join("",
+					Enumerable.Range(0, response.Items.Count)
+						.Select(i => (index: i, item: response.Items[i]))
+						.Aggregate("",
+							(text, t) => text + $"Search result {t.index + 1}: {t.item.Title} <{t.item.Link}>\n{t.item.Snippet}\n\n")
+						.Reverse()
+						.SkipWhile(c => c == '\n')
+						.Reverse()));
+			}).Wait();
 		}
 
 		static Config ReadConfig()
