@@ -6,6 +6,10 @@
     <RootNamespace>ISM_CSE</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <RuntimeIdentifiers>win-x64;win-x86;linux-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.32.0.896" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
