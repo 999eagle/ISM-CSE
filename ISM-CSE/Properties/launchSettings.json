@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ISM-CSE": {
+      "commandName": "Project",
+      "commandLineArgs": "test"
+    }
+  }
+}

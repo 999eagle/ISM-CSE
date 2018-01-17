@@ -42,6 +42,9 @@ namespace ISM_CSE
 						.SkipWhile(c => c == '\n')
 						.Reverse()));
 			}).Wait();
+#if DEBUG
+			Console.ReadLine();
+#endif
 		}
 
 		static Config ReadConfig()
