@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Google.Apis.Customsearch.v1;
@@ -12,6 +13,7 @@ namespace ISM_CSE
 	{
 		static void Main(string[] args)
 		{
+			Console.OutputEncoding = Encoding.UTF8;
 			var config = ReadConfig();
 			if (config == null) return;
 			if (args.Length == 0)
