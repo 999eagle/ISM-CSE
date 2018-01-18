@@ -90,9 +90,9 @@ namespace ISM_CSE
 				request.Num = Math.Min(count, maxNum);
 				request.Start = start;
 				var response = await request.ExecuteAsync();
-				if (count <= maxNum || response.Items.Count < response.Items.Count)
+				if (count <= maxNum || response.Items == null || response.Items.Count < response.Items.Count)
 				{
-					return response.Items;
+					return response.Items ?? new Result[0];
 				}
 				else
 				{
