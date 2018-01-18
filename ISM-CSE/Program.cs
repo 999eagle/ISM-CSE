@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Google.Apis.Customsearch.v1;
@@ -16,6 +17,8 @@ namespace ISM_CSE
 	{
 		class Options
 		{
+			[Option('a', "analyze", Default = false, HelpText = "Output position of first link to FB5.")]
+			public bool Analyze { get; set; }
 			[Option('c', "count", Default = 10, HelpText = "Number of search results.", MetaValue = "number")]
 			public int Count { get; set; }
 			[Value(0, Required = true, HelpText = "Term to search for.", MetaName = "search term")]
@@ -45,15 +48,34 @@ namespace ISM_CSE
 			try
 			{
 				var items = await RequestResults(options.Count);
-				Console.WriteLine(
-					String.Join("",
+				var indexedItems =
 					Enumerable.Range(0, items.Count())
-						.Zip(items, (idx, item) => (index: idx, item: item))
-						.Aggregate("",
-							(text, t) => text + $"Search result {t.index + 1}: {t.item.Title} <{t.item.Link}>\n{t.item.Snippet}\n\n")
-						.Reverse()
-						.SkipWhile(c => c == '\n')
-						.Reverse()));
+						.Zip(items, (idx, item) => (index: idx, item: item));
+				string formatItem(Result item) => $"{item.Title} <{item.Link}>\n{item.Snippet}\n";
+				if (options.Analyze)
+				{
+					var regex = new Regex(@"^https?:\/\/(www\.)?inf\.hs-anhalt\.de.*$");
+					var (index, item) = indexedItems.FirstOrDefault(t => regex.IsMatch(t.item.Link));
+					if (item != null)
+					{
+						Console.WriteLine($"First search result for FB5 (position {index + 1}): {formatItem(item)}");
+					}
+					else
+					{
+						Console.WriteLine("No results relevant to FB5");
+					}
+				}
+				else
+				{
+					Console.WriteLine(
+						String.Join("",
+						indexedItems
+							.Aggregate("",
+								(text, t) => text + $"Search result {t.index + 1}: {formatItem(t.item)}\n")
+							.Reverse()
+							.SkipWhile(c => c == '\n')
+							.Reverse()));
+				}
 			}
 			catch (Google.GoogleApiException ex)
 			{
