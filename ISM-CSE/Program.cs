@@ -31,16 +31,23 @@ namespace ISM_CSE
 				var request = searchService.Cse.List(String.Join(" ", args));
 				request.Cx = config.SearchEngineID;
 				request.Num = 10;
-				var response = await request.ExecuteAsync();
-				Console.WriteLine(
-					String.Join("",
-					Enumerable.Range(0, response.Items.Count)
-						.Select(i => (index: i, item: response.Items[i]))
-						.Aggregate("",
-							(text, t) => text + $"Search result {t.index + 1}: {t.item.Title} <{t.item.Link}>\n{t.item.Snippet}\n\n")
-						.Reverse()
-						.SkipWhile(c => c == '\n')
-						.Reverse()));
+				try
+				{
+					var response = await request.ExecuteAsync();
+					Console.WriteLine(
+						String.Join("",
+						Enumerable.Range(0, response.Items.Count)
+							.Select(i => (index: i, item: response.Items[i]))
+							.Aggregate("",
+								(text, t) => text + $"Search result {t.index + 1}: {t.item.Title} <{t.item.Link}>\n{t.item.Snippet}\n\n")
+							.Reverse()
+							.SkipWhile(c => c == '\n')
+							.Reverse()));
+				}
+				catch (Google.GoogleApiException ex)
+				{
+					Console.WriteLine($"API call failed. Reason: {ex.Message}");
+				}
 			}).Wait();
 #if DEBUG
 			Console.ReadLine();
